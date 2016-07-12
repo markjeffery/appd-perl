@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+use LWP::UserAgent;
+use HTTP::Request;
 use appd;
 
 $cfg = appd::newConfig();
@@ -8,9 +10,9 @@ appd::appd_config_init($cfg);
 print "Config init OK\n";
 
 # set AppD SDK config
-appd::set_app_name($cfg, "Perl");
-appd::set_tier_name($cfg, "Foo");
-appd::set_node_name($cfg, "bar");
+appd::set_app_name($cfg, "TestApp");
+appd::set_tier_name($cfg, "Perl");
+appd::set_node_name($cfg, "foobar");
 
 appd::set_controller_host($cfg, "localhost");
 appd::set_controller_port($cfg, 8090);
@@ -28,7 +30,8 @@ if($rc == 0) {
     # add a backend
     $backendname = "foobar";
     appd::appd_backend_declare($appd::APPD_BACKEND_HTTP, $backendname);
-    $rc = appd::appd_backend_set_identifying_property($backendname, "HOST", "myhost.com");
+    $rc = appd::appd_backend_set_identifying_property($backendname, "HOST", "localhost");
+    $rc = appd::appd_backend_set_identifying_property($backendname, "PORT", "8080");
     if($rc != 0) {
         die "Failed to set host on backend\n";
     }
@@ -37,14 +40,27 @@ if($rc == 0) {
         die "Failed to add backend\n";
     }
     # Loop through a BT a few times
-    for($i = 1; $i <= 10; $i++) {
+    for($i = 1; $i <= 20; $i++) {
         print "Starting BT\n";
         $bt = appd::appd_bt_begin("foobar", "");
         print "BT started $bt\n";
         sleep(1);
         $exit = appd::appd_exitcall_begin($bt, $backendname);
         print "Exit call started $exit\n";
-        sleep(1);
+        # call HTTP backend
+        $ua = LWP::UserAgent->new;
+        $ua->agent("$0/0.1" . $ua->agent);
+        $correlation = appd::appd_exitcall_get_correlation_header($exit);
+        print "Correlation header $correlation\n";
+        $req = new HTTP::Request 'GET', 'http://localhost:8080/TestApp/index.jsp';
+        $req->header($appd::APPD_CORRELATION_HEADER_NAME => $correlation);
+        $resp = $ua->request($req);
+        if($resp->is_success) {
+            $page = $resp->decoded_content;
+            print "Got page\n";
+        } else {
+            print "Error " . $resp->status_line . "\n";
+        }
         appd::appd_exitcall_end($exit);
         appd::appd_bt_end($bt);
         print "BT ended\n";
