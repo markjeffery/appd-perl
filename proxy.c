@@ -119,7 +119,7 @@ void dump_config(struct appd_config *cfg) {
     printf("controller port %d\n", cfg->controller.port);
     printf("controller account %s\n", cfg->controller.account);
     printf("controller access key %s\n", cfg->controller.access_key);
-    printf("controller use ssl %c\n", cfg->controller.use_ssl);
+    printf("controller use ssl %d\n", cfg->controller.use_ssl);
     printf("\n");
     printf("init timeout ms %d\n", cfg->init_timeout_ms);
     printf("\n");

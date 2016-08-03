@@ -19,7 +19,7 @@ appd::set_controller_port($cfg, 8090);
 appd::set_controller_account($cfg, "customer1");
 appd::set_controller_access_key($cfg, "6ca84575-ffec-470d-8099-9e527ade5033");
 appd::set_controller_use_ssl($cfg, 0);
-appd::set_init_timeout_ms($cfg, 0);
+appd::set_init_timeout_ms($cfg, 5000);
 
 # Debug
 appd::dump_config($cfg);
