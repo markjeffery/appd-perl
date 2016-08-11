@@ -6,3 +6,9 @@ This has only been tested on Linux
 Remember to set LD_LIBRARY_PATH to include the AppDynamics SDK
 
 See appd.pl for some example usage.
+
+Note:
+
+Perl 5.6 works with Swig 1.x
+
+Perl 5.10 requires Swig 2.x or newer
